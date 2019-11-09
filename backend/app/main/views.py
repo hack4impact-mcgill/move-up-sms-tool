@@ -5,7 +5,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 from . import main
 from .. import db
 from .models import Survey, Question, Answer 
-import uuid
+
 
 # get all users
 @main.route("/", methods=["GET"])

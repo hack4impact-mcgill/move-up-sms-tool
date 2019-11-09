@@ -1,8 +1,3 @@
-import os
-
-basedir = os.path.abspath(os.path.dirname(__file__))
-
-
 class Config:
     APP_NAME = "Move Up CRM Tool"
     SECRET_KEY = os.environ.get("SECRET_KEY") or "hard to guess string"
@@ -16,8 +11,8 @@ class Config:
 class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = (
-        'sqlite:///' + os.path.join(os.path.abspath(os.path.dirname(__file__)), 'test.sqlite'))
-        #os.environ.get("DEV_DATABASE_URL"))
+        os.environ.get("DEV_DATABASE_URL")
+    )
 
 
 class TestingConfig(Config):
