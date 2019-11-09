@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 
-from flask_script import Manager
+from flask_script import Manager, Shell
 from flask_migrate import Migrate, MigrateCommand
 
 # Import settings from .env file. Must define FLASK_CONFIG
@@ -12,7 +12,7 @@ if os.path.exists('.env'):
         if len(var) == 2:
             os.environ[var[0]] = var[1]
 
-from app import create_app, db
+from app import create_app, db, parsers
 
 app = create_app(os.getenv("FLASK_CONFIG") or "default")
 manager = Manager(app)
@@ -32,6 +32,12 @@ def test():
 def recreate_db():
     db.drop_all()
     db.create_all()
+
+
+@manager.command
+def dbseed():
+    with open('signup_form.json') as survey_file:
+        db.save(parsers.survey_from_json(survey_file.read()))
 
 
 def make_shell_context():
