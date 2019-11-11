@@ -22,6 +22,40 @@ To see all installed modules:
 pip list
 ```
 
+## Running the server
+
+To run the basic server, we'll use ngrok through Twilio's CLI.
+
+Check that you have NodeJs:
+```
+node -v
+```
+
+Download Twilio's CLI.
+```
+npm install twilio-cli -g
+```
+
+Login. The first can be anything, and then it will prompt you for account details.
+```
+twilio login
+```
+
+Open an ngrok tunnel (aka connect your application to the internet). You can monitor requests at the address that ngrok gives you.
+```
+twilio phone-numbers:update "+14388003554" --sms-url="http://localhost:5000/message"
+```
+
+In a separate terminal, run the application.
+```
+python manage.py recreate_db  # create the databases
+python manage.py dbseed  # load the signup form from json
+python manage.py runserver
+```
+
+Try texting the number!
+
+
 ## Flask App Folder Structure
 
 ```

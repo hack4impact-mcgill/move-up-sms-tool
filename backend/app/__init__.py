@@ -18,3 +18,9 @@ def create_app(config_name):
     app.register_blueprint(main_blueprint)
 
     return app
+
+
+def save_and_commit(item):
+    db.session.add(item)
+    db.session.commit()
+db.save = save_and_commit

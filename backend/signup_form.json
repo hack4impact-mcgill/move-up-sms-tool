@@ -1,0 +1,17 @@
+{
+    "questions": [
+      {
+        "body": "What is your name?",
+	"type": "text"
+      },
+      {
+        "body": "Do you like this form?",
+	"type": "boolean"
+      },
+      {
+        "body": "Rate your day so far.",
+	"type": "numeric"
+      }
+    ],
+    "title": "Flask"
+}
