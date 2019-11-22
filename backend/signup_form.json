@@ -5,13 +5,13 @@
 	"type": "text"
       },
       {
-        "body": "Do you like this form?",
-	"type": "boolean"
+        "body": "What's your email address?",
+	"type": "email"
       },
       {
-        "body": "Rate your day so far.",
-	"type": "numeric"
+        "body": "Rate your day so far. 1=good, 2=bad.",
+	"type": "enum"
       }
     ],
-    "title": "Flask"
+    "title": "Sample form"
 }
