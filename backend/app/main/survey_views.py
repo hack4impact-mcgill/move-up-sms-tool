@@ -15,6 +15,8 @@ def sms_signup():
     if survey_error(signup_survey, response.message):
         return str(response)
     
+    session['id'] = request.values['Body']
+
     if 'question_id' in session:
         response.redirect(url_for('main.answer',
                                   question_id=session['question_id']))
@@ -45,5 +47,5 @@ def redirect_to_first_question(response, survey):
 
 # Send a welcome message to the user
 def welcome_user(survey, send_function):
-    welcome_text = 'Welcome to MoveUp\'s SMS signup tool! To continue signing up, head to their website (...) or respond MOVEUP to this message to continue here.'
+    welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond MOVEUP.'
     send_function(welcome_text)
