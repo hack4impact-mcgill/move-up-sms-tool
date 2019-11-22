@@ -3,7 +3,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 
 from . import main
 from .. import db
-from .models import Answer, Question, TYPE_OBJECTS
+from .models import Answer, Question, EnumResponse, TYPE_OBJECTS
 
 
 @main.route('/answer/<question_id>', methods=['POST'])
@@ -12,10 +12,15 @@ def answer(question_id):
 
     # Verify the response matches the expected type
     # If not, prompt user
-    if not is_allowed_answer(request.values['Body'], question.kind):
+    if not is_allowed_answer(request.values['Body'], question):
         return redirect_invalid_twiml(question)
 	
-    db.save(Answer(content=request.values['Body'],
+    if question.kind is Question.ENUM:
+        answer_body = EnumResponse(question).map_value(request.values['Body'])
+    else:
+        answer_body = request.values['Body']
+
+    db.save(Answer(content=answer_body,
             question=question,
             session_id=session['id']))
 
@@ -27,8 +32,11 @@ def answer(question_id):
 
 
 # Verify that the answer matches the expected type
-def is_allowed_answer(body, kind):
-    return TYPE_OBJECTS[kind].is_of_type(body)
+def is_allowed_answer(body, question):
+    if question.kind is Question.ENUM:
+        return EnumResponse(question).is_of_type(body)
+    else:
+        return TYPE_OBJECTS[question.kind].is_of_type(body)
 
 
 # Redirect invalid answer

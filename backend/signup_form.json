@@ -1,17 +1,70 @@
 {
     "questions": [
       {
-        "body": "What is your name?",
-	"type": "text"
+        "body": "What's your first name?",
+	"type": "text",
+        "values": []	
       },
       {
-        "body": "What's your email address?",
-	"type": "email"
+        "body": "What's your last name?",
+	"type": "text",
+        "values": []
       },
       {
-        "body": "Rate your day so far. 1=good, 2=bad.",
-	"type": "enum"
+        "body": "Enter your email address.",
+	"type": "email",
+        "values": [] 
+      },
+      {
+        "body": "Enter a safe phone number to reach you.",
+	"type": "text",
+        "values": [] 
+      },
+      {
+        "body": "What state do you live in?",
+	"type": "text",
+        "values": [] 
+      },
+      {
+        "body": "What gender are you?\n1-Female\n2-Male\n3-Non-binary\n4-Prefer not to say",
+	"type": "enum",
+	"values": [ "Female", "Male", "Non-binary", "Prefer not to say" ]
+      }, 
+      {
+        "body": "What is your race/ethnicity?\n1-Asian/South Asian\n2-Black or African American\n3-Hispanic or Latino\n4-Native Hawaiian or Other Pacific Islander\n5-Caucasian/White\n6-American Indian or Alaska Native\n7-Other\n8-Prefer not to say",
+	"type": "enum",
+	"values": [ "Asian/South Asian", "Black or African American", "Hispanic or Latino", "Native Hawaiian or Other Pacific Islander", "Caucasian/White", "American Indian or Alaska Native", "Other", "Prefer not to say" ]
+      },
+      {
+        "body": "What's your age?\n1-Under 18\n2-18-24\n3-25-39\n4-40-54\n5-55-64\n6-65+\n7-Prefer not to say",
+	"type": "enum",
+	"values": [ "Under 18", "18-24", "25-39", "40-54", "55-64", "65+", "Prefer not to say" ]
+      },
+      {
+        "body": "What is your family's yearly income?\n1-Less than $20,000\n2-$20,000 to $34,999\n3-$35,000 to $49,999\n4-$50,000 to $99,999\n5-$100,000 to $149,999\n6-Over $150,000\n7-Prefer not to say",
+	"type": "enum",
+	"values": [ "Less than $20,000", "$20,000 to $34,999", "$35,000 to $49,999", "$50,000 to $99,999", "$100,000 to $149,999", "Over $150,000", "Prefer not to say" ]
+      },
+      {
+        "body": "What is your highest level of education and what did you study? (Can also state no degree, Move Up works with clients of all backgrounds!)\n1-Grammar School\n2-High School or equivalent\n3-Vocational/Technical School (2 year)\n4-Some College\n5-College Graduate (4 year)\n6-Master's Degree (MS)\n7-Doctoral Degree (PhD)\n8-Professional Degree (MD, JD, etc.)",
+	"type": "enum",
+	"values": [ "Grammar School", "High School or equivalent", "Vocational/Technical School (2 year)", "Some College", "College Graduate (4 year)", "Master's Degree (MS)", "Doctoral Degree (PhD)", "Professional Degree (MD, JD, etc.)" ]
+      }, 
+      {
+        "body": "How did you hear about Move Up?\n1-Facebook Group\n2-Move Up website\n3-Other Nonprofit\n4-Other",
+	"type": "enum",
+	"values": [ "Facebook Group", "Move Up website", "Other Nonprofit", "Other" ]
+      },
+      {
+        "body": "What days of the week and times (morning/evening) are best to call you?",
+	"type": "text",
+        "values": [] 
+      },
+      {
+        "body": "Please review the Move Up Release and Waiver of Liability. By printing your initials, you agree to the terms and conditions of Move Up's Release. https://bit.ly/1w7QueJ",
+	"type": "text",
+        "values": [] 
       }
-    ],
+     ],
     "title": "Sample form"
 }

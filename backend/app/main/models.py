@@ -31,17 +31,22 @@ class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String, nullable=False)
     kind = db.Column(db.Enum(TEXT, EMAIL, ENUM, name='question_kind'))
+    enum_values = db.Column(db.PickleType())
     survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
     answers = db.relationship('Answer', backref='question', lazy='dynamic')
 
-    def __init__(self, content, kind=TEXT):
+    def __init__(self, content, kind=TEXT, enum_values=[]):
         self.content = content
         self.kind = kind
+        self.enum_values = enum_values
 
     def next(self):
         return self.survey.questions\
 	            .filter(Question.id > self.id)\
                     .order_by('id').first()
+
+    def get_enum_values(self):
+        return self.enum_values
 
 
 class Answer(db.Model):
@@ -94,12 +99,26 @@ class EmailResponse(ResponseType):
 
 
 class EnumResponse(ResponseType):
+    def __init__(self, question=None):
+        self.question = question
+    
     def is_of_type(self, arg):
-        return True
+        try:
+            if self.map_value(arg) is not None:
+                return True
+            else:
+                return False
+        except TypeError:
+            return False
+        except IndexError:
+            return False
 
     def instruction_text(self):
-        return 'Please enter the corresponding number or text for "Other" or "Prefer not to say".'
+        return 'Please enter the corresponding number.'
 
+    def map_value(self, body):
+        print(self.question.get_enum_values())
+        return (self.question.get_enum_values())[int (body)]
 
 # Connect db types with their corresponding objects
 # for SMS instructions and validating responses
