@@ -101,23 +101,20 @@ class EmailResponse(ResponseType):
 class EnumResponse(ResponseType):
     def __init__(self, question=None):
         self.question = question
-    
+
     def is_of_type(self, arg):
         try:
             if self.map_value(arg) is not None:
                 return True
             else:
                 return False
-        except TypeError:
-            return False
-        except IndexError:
+        except (TypeError, IndexError):
             return False
 
     def instruction_text(self):
         return 'Please enter the corresponding number.'
 
     def map_value(self, body):
-        print(self.question.get_enum_values())
         return (self.question.get_enum_values())[int (body)]
 
 # Connect db types with their corresponding objects
