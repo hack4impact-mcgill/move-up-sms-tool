@@ -15,7 +15,7 @@ def sms_signup():
     if survey_error(signup_survey, response.message):
         return str(response)
     
-    session['id'] = request.values['Body']
+    session['id'] = request.values['From']
 
     if 'question_id' in session:
         response.redirect(url_for('main.answer',
