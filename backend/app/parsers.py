@@ -14,6 +14,5 @@ def questions_from_json(survey_json_string):
     for question_dict in questions_dicts:
         body = question_dict['body']
         kind = question_dict['type']
-        values = question_dict['values']
-        questions.append(Question(content=body, kind=kind, enum_values=values))
+        questions.append(Question(content=body, kind=kind))
     return questions
