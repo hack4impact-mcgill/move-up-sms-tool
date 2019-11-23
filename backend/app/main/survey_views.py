@@ -24,6 +24,8 @@ def sms_signup():
         redirect_to_first_question(response, signup_survey)
     elif request.values.get('Body', None) == 'MOVEUP':
         welcome_user(signup_survey, response.message)
+    else:
+        response.message(None)
     return str(response)
 
 
