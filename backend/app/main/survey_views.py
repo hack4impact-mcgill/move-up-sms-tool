@@ -1,5 +1,8 @@
 from flask import url_for, session, request
 from twilio.twiml.messaging_response import MessagingResponse
+#my import
+import os
+import requests
 
 from . import main
 from .models import Survey
@@ -7,7 +10,7 @@ from .models import Survey
 
 # Main control flow; direct user to welcome message or next question
 # TODO verify that the user has not already completed the form
-@main.route('/message')
+@main.route('/message', methods=['GET'])
 def sms_signup():
     response = MessagingResponse()
 
@@ -16,10 +19,26 @@ def sms_signup():
         return str(response)
     
     session['id'] = request.values['From']
-
+    
     if 'question_id' in session:
-        response.redirect(url_for('main.answer',
-                                  question_id=session['question_id']))
+        ##My code starts here
+        phone_number = request.values.get('From', None)
+        phone = "%2B" + phone_number[1: ]
+        print("Hello:!!!! "+ phone)
+
+        my_response = requests.get( 
+        "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses?filterByFormula={Phone_Number}='"+phone+"'",
+        headers={"Authorization": str(os.environ.get("API_KEY"))},
+        )
+
+        response_id = "no"
+        if my_response.status_code ==200:
+            response_json = my_response.json()
+            for r in response_json["records"]:
+                response_id = r["id"]
+        ##My code ends here
+        response.redirect(url_for('main.answer', question_id=session['question_id'], record_id=response_id))
+
     elif request.values.get('Body', None) == 'SIGNUP':
         redirect_to_first_question(response, signup_survey)
     elif request.values.get('Body', None) == 'MOVEUP':
