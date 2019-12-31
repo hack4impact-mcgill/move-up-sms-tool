@@ -1,5 +1,4 @@
 from flask import url_for, session, request, jsonify
-# My imports
 import os
 import requests
 
@@ -13,6 +12,7 @@ from .response_types import TYPE_OBJECTS
 
 @main.route('/answer/<question_id>/<record_id>', methods=['POST','PATCH'])
 def answer(question_id,record_id):
+
     question = Question.query.get(question_id)
 
     # Verify the response matches the expected type
@@ -24,68 +24,42 @@ def answer(question_id,record_id):
             question=question,
             session_id=session['id']))
 
-    
-    #Store it in the Airtable
+    # Check which field name to create or update
     if question_id == '1':
         field_name = "Name"
     else:
         field_name = "Email"
-    
-    temp_info = {
-        field_name: request.values['Body'],
-    }
-    temp_field = {"fields": temp_info}
-    temp_json = {"records": [temp_field]}
 
-   # headers = {'Authorization': 'Bearer keybp9BmMeD5OLIjq', 'Content-Type': 'application/json; charset=utf-8'}
-    req = requests.post('https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses',json=temp_json,headers={"Authorization": str(os.environ.get("API_KEY"))})
-    response_json = req.json()
-    
-    for r in response_json["records"]:
-        row_id = r["id"]
+    # Check if the record does not exist in the database
+    if record_id == "NONE":
+        temp_field = {
+            "fields": {
+            field_name: request.values['Body'],
+            "Phone_Number": request.values['From'],
+        }}
+        temp_json = {"records": [temp_field]}
+        # Create new record
+        req = requests.post(
+            'https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses',json=temp_json,
+            headers={"Authorization": str(os.environ.get("API_KEY"))})
+
+    else:
+        # If the record exists in the database, update the value
+        temp_field = {
+            "fields": {
+            field_name: request.values['Body']
+        }}
+        id = record_id;
+        # Update record
+        response = requests.patch( 
+            "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses/{}".format(id),json=temp_field,
+            headers={"Authorization": str(os.environ.get("API_KEY"))})
 
     next_question = question.next()
     if next_question:
         return redirect_twiml(next_question)
     else:
         return goodbye_twiml()
-
-#My own route
-@main.route('/test', methods=['GET'])
-def test():
-    #To Store information in Airtable
-    temp_info = {
-        "Email": "madonna197@outlook.com",
-    }
-    temp_field = {"fields": temp_info}
-    temp_json = {"records": [temp_field]}
-
-   # headers = {'Authorization': 'Bearer keybp9BmMeD5OLIjq', 'Content-Type': 'application/json; charset=utf-8'}
-    req = requests.post('https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses',json=temp_json,headers={"Authorization": str(os.environ.get("API_KEY"))})
-    response_json = req.json()
-    
-    for r in response_json["records"]:
-        row_id = r["id"]
-
-    return str(row_id)
-
-@main.route('/test_get_phone', methods=['GET'])
-def test_get_phone():
-    #To see if the client is already in the airtable
-    name = "%2B15147469875"
-    # .format('FIND("Madonna",{name})')
-    #{Email}='514'
-    response = requests.get( 
-        "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses?filterByFormula={Phone_Number}='"+name+"'",
-        headers={"Authorization": str(os.environ.get("API_KEY"))},
-    )
-    response_id = ""
-    if response.status_code ==200:
-        response_json = response.json()
-        for r in response_json["records"]:
-            response_id = r["id"]
-    
-    return str(response_id)
 
 # Verify that the answer matches the expected type
 def is_allowed_answer(body, question):

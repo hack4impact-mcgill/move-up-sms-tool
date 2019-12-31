@@ -21,23 +21,24 @@ def sms_signup():
     session['id'] = request.values['From']
     
     if 'question_id' in session:
-        ##My code starts here
+        # Retrieve the Client's phone number and format it
         phone_number = request.values.get('From', None)
         phone = "%2B" + phone_number[1: ]
-        print("Hello:!!!! "+ phone)
 
-        my_response = requests.get( 
-        "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses?filterByFormula={Phone_Number}='"+phone+"'",
-        headers={"Authorization": str(os.environ.get("API_KEY"))},
-        )
+        # Check if record already exists
+        prev_response = requests.get( 
+            "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses?filterByFormula={Phone_Number}='"+phone+"'",
+            headers={"Authorization": str(os.environ.get("API_KEY"))})
+        response_id = "NONE"
 
-        response_id = "no"
-        if my_response.status_code ==200:
-            response_json = my_response.json()
+        if prev_response.status_code == 200:
+            response_json = prev_response.json()
             for r in response_json["records"]:
                 response_id = r["id"]
-        ##My code ends here
-        response.redirect(url_for('main.answer', question_id=session['question_id'], record_id=response_id))
+
+        # Redirect the response to the answer-saving url
+        answer_url = url_for('main.answer', question_id=session['question_id'], record_id=response_id)
+        response.redirect(url=answer_url)
 
     elif request.values.get('Body', None) == 'SIGNUP':
         redirect_to_first_question(response, signup_survey)
