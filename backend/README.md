@@ -16,7 +16,7 @@ To install dependencies from a `requirements.txt` file, do this:
 pip install -r /path/to/requirements.txt
 ```
 
-To see all installed modules:
+You only need to install the dependencies onece. To see all installed modules:
 
 ```
 pip list
@@ -36,17 +36,19 @@ Download Twilio's CLI.
 npm install twilio-cli -g
 ```
 
-Login. The first can be anything, and then it will prompt you for account details.
+Login. The terminal will prompt you for account details. 
 ```
 twilio login
 ```
 
-Open an ngrok tunnel (aka connect your application to the internet). You can monitor requests at the address that ngrok gives you.
+Open an ngrok tunnel (aka connect your application to the internet). You can monitor requests at the address that ngrok gives you (i.e. the link showed in the terminal).
+
+Type the following command in ther terminal.
 ```
 twilio phone-numbers:update "+14388003554" --sms-url="http://localhost:5000/message"
 ```
 
-In a separate terminal, run the application.
+In a separate terminal, run the application:
 ```
 python manage.py recreate_db  # create the databases
 python manage.py dbseed  # load the signup form from json
