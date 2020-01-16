@@ -40,9 +40,9 @@ def sms_signup():
         answer_url = url_for('main.answer', question_id=session['question_id'], record_id=response_id)
         response.redirect(url=answer_url)
 
-    elif request.values.get('Body', None) == 'SIGNUP':
+    elif request.values.get('Body', None).strip() == 'SIGNUP':
         redirect_to_first_question(response, signup_survey)
-    elif request.values.get('Body', None) == 'MOVEUP':
+    elif request.values.get('Body', None).strip() == 'MOVEUP':
         welcome_user(signup_survey, response.message)
     else:
         response.message(None)
