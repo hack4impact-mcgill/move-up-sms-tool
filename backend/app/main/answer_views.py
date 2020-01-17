@@ -1,9 +1,7 @@
 from flask import url_for, session, request, jsonify
+from twilio.twiml.messaging_response import MessagingResponse
 import os
 import requests
-
-from twilio.twiml.messaging_response import MessagingResponse
-
 from . import main
 from .. import db
 from .models import Answer, Question
@@ -24,36 +22,17 @@ def answer(question_id,record_id):
             question=question,
             session_id=session['id']))
 
-    # Check which field name to create or update
+    # Check which field name to create/update
     if question_id == '1':
         field_name = "Name"
     else:
         field_name = "Email"
 
-    # Check if the record does not exist in the database
+    # Check the record id to see if the client's information exists in the Airtable
     if record_id == "NONE":
-        temp_field = {
-            "fields": {
-            field_name: request.values['Body'],
-            "Phone_Number": request.values['From'],
-        }}
-        temp_json = {"records": [temp_field]}
-        # Create new record
-        req = requests.post(
-            'https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses',json=temp_json,
-            headers={"Authorization": str(os.environ.get("API_KEY"))})
-
+        create_airtable_record(request.values['From'], field_name,request.values['Body'])
     else:
-        # If the record exists in the database, update the value
-        temp_field = {
-            "fields": {
-            field_name: request.values['Body']
-        }}
-        id = record_id;
-        # Update record
-        response = requests.patch( 
-            "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses/{}".format(id),json=temp_field,
-            headers={"Authorization": str(os.environ.get("API_KEY"))})
+        update_airtable_record(record_id, field_name, request.values['Body'])
 
     next_question = question.next()
     if next_question:
@@ -92,4 +71,24 @@ def goodbye_twiml():
         del session['question_id']
     return str(response)
 
+# Update the client's previous record in the Aritable
+def update_airtable_record(record_id, field_name, field_value):
+    temp_field = {
+        "fields": {
+        field_name: field_value
+    }}
+    requests.patch( 
+            "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses/{}".format(record_id),json=temp_field,
+            headers={"Authorization": str(os.environ.get("API_KEY"))})
 
+# Create a new record in the Airtable for the client and store their phone numbers
+def create_airtable_record(phone_num, field_name, field_value):
+    temp_field = {
+        "fields": {
+        field_name: field_value,
+        "Phone_Number": phone_num,
+    }}
+    temp_record = {"records": [temp_field]}
+    requests.post(
+        'https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses',json=temp_record,
+        headers={"Authorization": str(os.environ.get("API_KEY"))})
