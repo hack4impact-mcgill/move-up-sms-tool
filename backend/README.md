@@ -16,7 +16,7 @@ To install dependencies from a `requirements.txt` file, do this:
 pip install -r /path/to/requirements.txt
 ```
 
-You only need to install the dependencies onece. To see all installed modules:
+You only need to install the dependencies once. To see all installed modules:
 
 ```
 pip list

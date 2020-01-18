@@ -5,7 +5,6 @@ import requests
 from . import main
 from .models import Survey
 
-
 # Main control flow: direct user to welcome message or next question
 @main.route('/message', methods=['GET'])
 def sms_signup():
@@ -18,10 +17,10 @@ def sms_signup():
     session['id'] = request.values['From']
     
     if 'question_id' in session:
-        # Retrieve the Client's phone number and format it
+        # Retrieve the client's phone number and format it
         phone_number = "%2B" + request.values.get('From', None)[1: ]
         # Retrieve the record id to check if the client registered before
-        response_id = retrievePrevRecord(phone_number)
+        response_id = retrieve_prev_record(phone_number)
         # Redirect the response to the answer-saving url
         answer_url = url_for('main.answer', question_id=session['question_id'], record_id=response_id)
         response.redirect(url=answer_url)
@@ -58,7 +57,7 @@ def welcome_user(survey, send_function):
     send_function(welcome_text)
 
 # Check if record already exists
-def retrievePrevRecord(phone_number):
+def retrieve_prev_record(phone_number):
     prev_response = requests.get( 
             "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses?filterByFormula={Phone_Number}='"+phone_number+"'",
             headers={"Authorization": str(os.environ.get("API_KEY"))})

@@ -71,7 +71,7 @@ def goodbye_twiml():
         del session['question_id']
     return str(response)
 
-# Update the client's previous record in the Aritable
+# Update the client's previous record in the Airtable
 def update_airtable_record(record_id, field_name, field_value):
     temp_field = {
         "fields": {
