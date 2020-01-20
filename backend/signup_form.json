@@ -1,12 +1,14 @@
 {
     "questions": [
       {
-        "body": "What's your full name?",
-	"type": "text"	
+        "text": "What's your full name?",
+	"kind": "text",
+	"airtable_id": "Name"
       },
       {
-        "body": "Please enter your email address.",
-	"type": "email" 
+        "text": "Please enter your email address.",
+	"kind": "email",
+	"airtable_id": "Email"
       }
    ],
    "title": "sign-up form"

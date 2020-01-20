@@ -1,63 +1,27 @@
-import json
-from app import db
-from werkzeug.security import generate_password_hash, check_password_hash
-
-# create model classes here
-
-class Survey(db.Model):
-    __tablename__ = 'surveys'
-
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String, nullable=False)
-    questions = db.relationship('Question', backref='survey', lazy='dynamic')
-
-    def __init__(self, title):
-        self.title = title
-
-    @property
-    def has_questions(self):
-        return self.questions.count() > 0
-
-
-class Question(db.Model):
-    __tablename__ = 'questions'
-
+class Question():
     TEXT = 'text'
     EMAIL = 'email'
 
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String, nullable=False)
-    kind = db.Column(db.Enum(TEXT, EMAIL, name='question_kind'))
-    survey_id = db.Column(db.Integer, db.ForeignKey('surveys.id'))
-    answers = db.relationship('Answer', backref='question', lazy='dynamic')
-
-    def __init__(self, content, kind=TEXT):
-        self.content = content
-        self.kind = kind
-
-    def next(self):
-        return self.survey.questions\
-	            .filter(Question.id > self.id)\
-                    .order_by('id').first()
+    def __init__(self, id, airtable_id, text, kind):
+        self.id = id
+        self.airtable_id = airtable_id
+        self.text = text
+        self.type = kind
 
 
-class Answer(db.Model):
-    __tablename__ = 'answers'
+class Survey():
+    def __init__(self):
+        self.questions = []
 
-    id = db.Column(db.Integer, primary_key=True)
-    content = db.Column(db.String, nullable=False)
-    session_id = db.Column(db.String, nullable=False)
-    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
+    def add_question(self, airtable_id, text, kind=Question.TEXT):
+        question = Question(len(self.questions), airtable_id, text, kind)
+        self.questions.append(question)
 
-    @classmethod
-    def update_content(cls, session_id, question_id, content):
-        existing_answer = cls.query.filter(Answer.session_id == session_id and
-                                           Answer.question_id == question_id).first()
-        existing_answer.content = content
-        db.session.add(existing_answer)
-        db.session.commit()
+    def first(self):
+        return self.questions[0]
 
-    def __init__(self, content, question, session_id):
-        self.content = content
-        self.question = question
-        self.session_id = session_id
+    def get(self, question_id):
+        return self.questions[int(question_id)]
+
+    def next(self, prev_id):
+        return self.questions[int(prev_id + 1)]
