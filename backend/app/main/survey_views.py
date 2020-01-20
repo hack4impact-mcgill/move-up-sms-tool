@@ -1,15 +1,11 @@
 from flask import url_for, session, request
 from twilio.twiml.messaging_response import MessagingResponse
-#my import
 import os
 import requests
-
 from . import main
 from .models import Survey
 
-
-# Main control flow; direct user to welcome message or next question
-# TODO verify that the user has not already completed the form
+# Main control flow: direct user to welcome message or next question
 @main.route('/message', methods=['GET'])
 def sms_signup():
     response = MessagingResponse()
@@ -21,25 +17,13 @@ def sms_signup():
     session['id'] = request.values['From']
     
     if 'question_id' in session:
-        # Retrieve the Client's phone number and format it
-        phone_number = request.values.get('From', None)
-        phone = "%2B" + phone_number[1: ]
-
-        # Check if record already exists
-        prev_response = requests.get( 
-            "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses?filterByFormula={Phone_Number}='"+phone+"'",
-            headers={"Authorization": str(os.environ.get("API_KEY"))})
-        response_id = "NONE"
-
-        if prev_response.status_code == 200:
-            response_json = prev_response.json()
-            for r in response_json["records"]:
-                response_id = r["id"]
-
+        # Retrieve the client's phone number and format it
+        phone_number = "%2B" + request.values.get('From', None)[1: ]
+        # Retrieve the record id to check if the client registered before
+        response_id = retrieve_prev_record(phone_number)
         # Redirect the response to the answer-saving url
         answer_url = url_for('main.answer', question_id=session['question_id'], record_id=response_id)
         response.redirect(url=answer_url)
-
     elif request.values.get('Body', None).strip() == 'SIGNUP':
         redirect_to_first_question(response, signup_survey)
     elif request.values.get('Body', None).strip() == 'MOVEUP':
@@ -71,3 +55,16 @@ def redirect_to_first_question(response, survey):
 def welcome_user(survey, send_function):
     welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
     send_function(welcome_text)
+
+# Check if record already exists
+def retrieve_prev_record(phone_number):
+    prev_response = requests.get( 
+            "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses?filterByFormula={Phone_Number}='"+phone_number+"'",
+            headers={"Authorization": str(os.environ.get("API_KEY"))})
+    # Default value for response id 
+    response_id = "NONE"
+    if prev_response.status_code == 200:
+        response_json = prev_response.json()
+        for r in response_json["records"]:
+            response_id = r["id"]
+    return response_id
