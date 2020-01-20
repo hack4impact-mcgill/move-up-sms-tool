@@ -43,7 +43,7 @@ twilio login
 
 Open an ngrok tunnel (aka connect your application to the internet). You can monitor requests at the address that ngrok gives you (i.e. the link showed in the terminal).
 
-Type the following command in ther terminal.
+Type the following command in the terminal.
 ```
 twilio phone-numbers:update "+14388003554" --sms-url="http://localhost:5000/message"
 ```
