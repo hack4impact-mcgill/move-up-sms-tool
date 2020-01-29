@@ -18,16 +18,16 @@ def sms_signup():
     
     if 'question_id' in session:
         # Retrieve the client's phone number and format it
-        phone_number = "%2B" + request.values.get('From', None)[1: ]
+        phone_number = "%2B" + request.values.get('From', " ")[1: ]
         # Retrieve the record id to check if the client registered before
         response_id = retrieve_prev_record(phone_number)
         # Redirect the response to the answer-saving url
         answer_url = url_for('main.answer', question_id=session['question_id'], record_id=response_id)
         response.redirect(url=answer_url)
-    elif request.values.get('Body', None).strip() == 'SIGNUP':
-        redirect_to_first_question(response, signup_survey)
-    elif request.values.get('Body', None).strip() == 'MOVEUP':
-        welcome_user(signup_survey, response.message)
+    elif request.values.get('Body', " ").strip() == 'SIGNUP':
+            redirect_to_first_question(response, signup_survey)
+    elif request.values.get('Body', " ").strip() == 'MOVEUP':
+            welcome_user(signup_survey, response.message)
     else:
         response.message(None)
     return str(response)
