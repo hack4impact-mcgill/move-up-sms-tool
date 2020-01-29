@@ -18,9 +18,9 @@ def answer(question_id, record_id):
 
     # Check the record id to see if the client's information exists in the Airtable
     if record_id == "NONE":
-        create_airtable_record(request.values['From'], airtable_id, request.values['Body'])
+        create_airtable_record(request.values['From'], question.airtable_id, request.values['Body'])
     else:
-        update_airtable_record(record_id, airtable_id, request.values['Body'])
+        update_airtable_record(record_id, question.airtable_id, request.values['Body'])
 
     next_question = signup_survey.next(question_id)
     if next_question:

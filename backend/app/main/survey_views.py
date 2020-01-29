@@ -30,6 +30,8 @@ def sms_signup():
     else:
         response.message(None)
     return str(response)
+    response.message(None)
+    return str(response)
 
 
 # Catch survey errors

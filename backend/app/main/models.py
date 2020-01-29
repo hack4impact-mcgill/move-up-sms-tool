@@ -6,7 +6,7 @@ class Question():
         self.id = id
         self.airtable_id = airtable_id
         self.text = text
-        self.type = kind
+        self.kind = kind
 
 
 class Survey():
@@ -24,4 +24,5 @@ class Survey():
         return self.questions[int(question_id)]
 
     def next(self, prev_id):
-        return self.questions[int(prev_id + 1)]
+    	if int(prev_id) < len(self.questions) - 1:
+        	return self.questions[int(prev_id) + 1]
