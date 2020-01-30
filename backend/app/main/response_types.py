@@ -3,7 +3,6 @@ import re
 from .models import Question
 
 class ResponseType(ABC):    
-
     @abstractmethod
     def is_valid(self, arg):
         pass

@@ -2,68 +2,56 @@ from flask import url_for, session, request, jsonify
 from twilio.twiml.messaging_response import MessagingResponse
 import os
 import requests
-from . import main
-from .. import db
-from .models import Answer, Question
+from . import main, signup_survey
 from .response_types import TYPE_OBJECTS
 
 
 @main.route('/answer/<question_id>/<record_id>', methods=['POST','PATCH'])
-def answer(question_id,record_id):
+def answer(question_id, record_id):
 
-    question = Question.query.get(question_id)
+    question = signup_survey.get(question_id)
 
     # Verify the response matches the expected type
     # If not, prompt user
-    if not is_allowed_answer(request.values['Body'], question):
-        return redirect_invalid_twiml(question)
-
-    db.save(Answer(content=request.values['Body'],
-            question=question,
-            session_id=session['id']))
-
-    # Check which field name to create/update
-    if question_id == '1':
-        field_name = "Name"
-    else:
-        field_name = "Email"
+    if not is_allowed_answer(request.values['Body'], question.kind):
+        return redirect_invalid_twiml(question.id)
 
     # Check the record id to see if the client's information exists in the Airtable
     if record_id == "NONE":
-        create_airtable_record(request.values['From'], field_name,request.values['Body'])
+        create_airtable_record(request.values['From'], question.airtable_id, request.values['Body'])
     else:
-        update_airtable_record(record_id, field_name, request.values['Body'])
+        update_airtable_record(record_id, question.airtable_id, request.values['Body'])
 
-    next_question = question.next()
+    next_question = signup_survey.next(question_id)
     if next_question:
-        return redirect_twiml(next_question)
+        return redirect_twiml(next_question.id)
     else:
         return goodbye_twiml()
 
 # Verify that the answer matches the expected type
-def is_allowed_answer(body, question):
-    return TYPE_OBJECTS[question.kind].is_valid(body)
+def is_allowed_answer(body, question_kind):
+    return TYPE_OBJECTS[question_kind].is_valid(body)
 
 
 # Redirect invalid answer
-def redirect_invalid_twiml(question):
+def redirect_invalid_twiml(question_id):
     response = MessagingResponse()
     response.message("Invalid response. Please try again!")
-    response.redirect(url=url_for('main.question', question_id=question.id),
+    response.redirect(url=url_for('main.question', question_id=question_id),
                       method='GET')
     return str(response)
 
 
 # Redirect to the question route
-def redirect_twiml(question):
+def redirect_twiml(question_id):
     response = MessagingResponse()
-    response.redirect(url=url_for('main.question', question_id=question.id),
+    response.redirect(url=url_for('main.question', question_id=question_id),
                       method='GET')
     return str(response)
 
 
 # Compose end of survey text
-# TODO show all entered values and ask user to confirm
+# TODO change message as per conversation with MoveUp
 def goodbye_twiml():
     response = MessagingResponse()
     response.message("Thank you for completing the signup form! We look forward to working with you!")

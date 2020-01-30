@@ -2,20 +2,19 @@ from flask import url_for, session, request
 from twilio.twiml.messaging_response import MessagingResponse
 import os
 import requests
-from . import main
-from .models import Survey
+from . import main, signup_survey
 
 # Main control flow: direct user to welcome message or next question
 @main.route('/message', methods=['GET'])
 def sms_signup():
-    response = MessagingResponse()
+    response = MessagingResponse()    
 
-    signup_survey = Survey.query.first()
     if survey_error(signup_survey, response.message):
         return str(response)
     
-    session['id'] = request.values['From']
-    
+    body = request.values.get('Body', None)
+    if body: body = body.strip()
+
     if 'question_id' in session:
         # Retrieve the client's phone number and format it
         phone_number = "%2B" + request.values.get('From', None)[1: ]
@@ -24,37 +23,40 @@ def sms_signup():
         # Redirect the response to the answer-saving url
         answer_url = url_for('main.answer', question_id=session['question_id'], record_id=response_id)
         response.redirect(url=answer_url)
-    elif request.values.get('Body', None).strip() == 'SIGNUP':
-        redirect_to_first_question(response, signup_survey)
-    elif request.values.get('Body', None).strip() == 'MOVEUP':
-        welcome_user(signup_survey, response.message)
+    elif body == 'SIGNUP':
+        redirect_to_first_question(response)
+    elif body == 'MOVEUP':
+        welcome_user(response.message)
     else:
         response.message(None)
+    return str(response)
+    response.message(None)
     return str(response)
 
 
 # Catch survey errors
 def survey_error(survey, send_function):
     if not survey:
-        send_function('No survey exists')  # we need to dbseed
+        send_function('No survey exists')
         return True
-    elif not survey.has_questions:
+    elif not survey.first():
         send_function('No questions')
         return True
     return False
 
 
 # Route the user to the first question
-def redirect_to_first_question(response, survey):
-    first_question = survey.questions.order_by('id').first()
+def redirect_to_first_question(response):
+    first_question = signup_survey.first()
     first_question_url = url_for('main.question', question_id=first_question.id)
     response.redirect(url=first_question_url, method='GET')
 
 
 # Send a welcome message to the user
-def welcome_user(survey, send_function):
+def welcome_user(send_function):
     welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
     send_function(welcome_text)
+
 
 # Check if record already exists
 def retrieve_prev_record(phone_number):
