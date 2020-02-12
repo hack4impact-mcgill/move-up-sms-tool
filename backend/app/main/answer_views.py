@@ -54,7 +54,7 @@ def redirect_twiml(question_id):
 # TODO change message as per conversation with MoveUp
 def goodbye_twiml():
     response = MessagingResponse()
-    response.message("Thank you for completing the signup form! We look forward to working with you!")
+    response.message("Thank you for completing the form. We will reach out to you shortly on next steps. We look forward to working with you.")
     if 'question_id' in session:
         del session['question_id']
     return str(response)
