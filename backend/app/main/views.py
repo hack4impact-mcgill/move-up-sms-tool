@@ -1,8 +1,5 @@
-import datetime
 from flask import Flask, jsonify, request, abort, make_response
-
-from . import main
-from .. import db 
+from . import main 
 
 
 # get all users
