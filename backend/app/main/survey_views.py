@@ -53,8 +53,16 @@ def redirect_to_first_question(response):
 
 
 # Send a welcome message to the user
+<<<<<<< HEAD
 def welcome_user(send_function):
     welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
+=======
+def welcome_user(survey, send_function, response_id):
+    if response_id=="NONE":
+        welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
+    else:
+        welcome_text = 'It appears as though we already have a response from you. If you would like to update your information, please respond SIGNUP. Otherwise, we will keep your current information as is.'
+>>>>>>> Asking the user if they wish to update info if we already have info stored. Otherwise, info left as is.
     send_function(welcome_text)
 
 
