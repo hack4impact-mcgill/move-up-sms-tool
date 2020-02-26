@@ -1,3 +1,4 @@
+# Class to define survey questions
 class Question():
     TEXT = 'text'
     EMAIL = 'email'
@@ -8,7 +9,7 @@ class Question():
         self.text = text
         self.kind = kind
 
-
+# Class to define the survey
 class Survey():
     def __init__(self):
         self.questions = []
