@@ -15,9 +15,10 @@ def sms_signup():
     body = request.values.get('Body', None)
     if body: body = body.strip()
 
-    if 'question_id' in session:
-        # Retrieve the client's phone number and format it
-        phone_number = "%2B" + request.values.get('From', " ")[1: ]
+    # Retrieve the client's phone number and format it
+    phone_number = "%2B" + request.values.get('From', " ")[1: ] 
+
+    if 'question_id' in session:    
         # Retrieve the record id to check if the client registered before
         response_id = retrieve_prev_record(phone_number)
         # Redirect the response to the answer-saving url
@@ -26,7 +27,7 @@ def sms_signup():
     elif body == 'SIGNUP':
         redirect_to_first_question(response)
     elif body == 'MOVEUP':
-        welcome_user(response.message)
+        welcome_user(response.message, (retrieve_prev_record(phone_number)=="NONE"))
     else:
         response.message(None)
     return str(response)
@@ -53,16 +54,11 @@ def redirect_to_first_question(response):
 
 
 # Send a welcome message to the user
-<<<<<<< HEAD
-def welcome_user(send_function):
-    welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
-=======
-def welcome_user(survey, send_function, response_id):
-    if response_id=="NONE":
+def welcome_user(send_function, is_prev_response=False):
+    if not is_prev_response:
         welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
     else:
         welcome_text = 'It appears as though we already have a response from you. If you would like to update your information, please respond SIGNUP. Otherwise, we will keep your current information as is.'
->>>>>>> Asking the user if they wish to update info if we already have info stored. Otherwise, info left as is.
     send_function(welcome_text)
 
 
