@@ -5,4 +5,4 @@ from . import main
 # get all users
 @main.route("/", methods=["GET"])
 def index():
-    return "Hello World!"
+    return "Welcome to MoveUP SMS Sign-Up Tool!"
