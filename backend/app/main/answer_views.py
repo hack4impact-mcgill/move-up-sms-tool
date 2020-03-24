@@ -4,7 +4,7 @@ import os
 import requests
 from . import main, signup_survey
 from .response_types import TYPE_OBJECTS
-
+from config import config
 
 @main.route('/answer/<question_id>/<record_id>', methods=['POST','PATCH'])
 def answer(question_id, record_id):
@@ -66,7 +66,7 @@ def update_airtable_record(record_id, field_name, field_value):
         field_name: field_value
     }}
     requests.patch( 
-            str(os.environ.get("DATABASE_URL")) + "/{}".format(record_id),json=temp_field,
+            config["development"].DATABASE_URL + "/{}".format(record_id),json=temp_field,
             headers={"Authorization": str(os.environ.get("API_KEY"))})
 
 # Create a new record in the Airtable for the client and store their phone numbers
@@ -78,5 +78,5 @@ def create_airtable_record(phone_num, field_name, field_value):
     }}
     temp_record = {"records": [temp_field]}
     requests.post(
-        str(os.environ.get("DATABASE_URL")), json=temp_record,
+        config["development"].DATABASE_URL, json=temp_record,
         headers={"Authorization": str(os.environ.get("API_KEY"))})

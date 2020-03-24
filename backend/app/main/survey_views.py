@@ -3,6 +3,7 @@ from twilio.twiml.messaging_response import MessagingResponse
 import os
 import requests
 from . import main, signup_survey
+from config import config
 
 # Main control flow: direct user to welcome message or next question
 @main.route('/message', methods=['GET'])
@@ -65,7 +66,7 @@ def welcome_user(send_function, is_prev_response=False):
 # Check if record already exists
 def retrieve_prev_record(phone_number):
     prev_response = requests.get( 
-            str(os.environ.get("DATABASE_URL")) + "?filterByFormula={Phone_Number}='" + phone_number + "'",
+            config["development"].DATABASE_URL + "?filterByFormula={Phone_Number}='" + phone_number + "'",
             headers={"Authorization": str(os.environ.get("API_KEY"))})
     # Default value for response id 
     response_id = "NONE"
