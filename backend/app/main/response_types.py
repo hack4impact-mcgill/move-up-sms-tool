@@ -12,7 +12,7 @@ class TextResponse(ResponseType):
     def is_valid(self, arg):
         return True
 
-
+# Regex matching to validate email addresses
 class EmailResponse(ResponseType):
     def is_valid(self, arg):
         return re.match(r'[^@]+@[^@]+\.[^@]+', arg)

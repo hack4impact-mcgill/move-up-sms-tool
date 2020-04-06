@@ -4,34 +4,34 @@ import os
 import requests
 from . import main, signup_survey
 
-# Main control flow: direct user to welcome message or next question
+# Main control flow: Direct the user to our welcome message or onto the next question.
 @main.route('/message', methods=['GET'])
 def sms_signup():
     response = MessagingResponse()    
-
+    
     if survey_error(signup_survey, response.message):
         return str(response)
-    
+
     body = request.values.get('Body', None)
     if body: body = body.strip()
 
-    # Retrieve the client's phone number and format it
-    phone_number = "%2B" + request.values.get('From', " ")[1: ] 
-
-    if 'question_id' in session:    
+    if 'question_id' in session:
+        # Retrieve the client's phone number and format it
+        phone_number = "%2B" + request.values.get('From', " ")[1: ]
         # Retrieve the record id to check if the client registered before
         response_id = retrieve_prev_record(phone_number)
         # Redirect the response to the answer-saving url
         answer_url = url_for('main.answer', question_id=session['question_id'], record_id=response_id)
         response.redirect(url=answer_url)
-    elif body == 'SIGNUP':
-        redirect_to_first_question(response)
     elif body == 'MOVEUP':
-        welcome_user(response.message, (retrieve_prev_record(phone_number)=="NONE"))
+        # First contact from user, send our welcome message
+        welcome_user(response.message)
+    elif body == 'SIGNUP':
+        # Begin survey questions
+        redirect_to_first_question(response)
     else:
+        # Otherwise, we do not send a message
         response.message(None)
-    return str(response)
-    response.message(None)
     return str(response)
 
 
@@ -54,24 +54,13 @@ def redirect_to_first_question(response):
 
 
 # Send a welcome message to the user
-<<<<<<< HEAD
-<<<<<<< HEAD
-def welcome_user(send_function):
-    welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
-=======
 def welcome_user(survey, send_function, response_id):
     if response_id=="NONE":
+        # First contact, send the welcome message
         welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
     else:
+        # We already have a file for this user, ask if they want to update their information or not
         welcome_text = 'It appears as though we already have a response from you. If you would like to update your information, please respond SIGNUP. Otherwise, we will keep your current information as is.'
->>>>>>> Asking the user if they wish to update info if we already have info stored. Otherwise, info left as is.
-=======
-def welcome_user(send_function, is_prev_response=False):
-    if not is_prev_response:
-        welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
-    else:
-        welcome_text = 'It appears as though we already have a response from you. If you would like to update your information, please respond SIGNUP. Otherwise, we will keep your current information as is.'
->>>>>>> d5da3a0a98b2ecd88b9c6b62c4d2e1e2d222e311
     send_function(welcome_text)
 
 
@@ -80,9 +69,10 @@ def retrieve_prev_record(phone_number):
     prev_response = requests.get( 
             "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses?filterByFormula={Phone_Number}='"+phone_number+"'",
             headers={"Authorization": str(os.environ.get("API_KEY"))})
-    # Default value for response id 
+    # Default value for response id is NONE
     response_id = "NONE"
     if prev_response.status_code == 200:
+        # Request has succeeded
         response_json = prev_response.json()
         for r in response_json["records"]:
             response_id = r["id"]
