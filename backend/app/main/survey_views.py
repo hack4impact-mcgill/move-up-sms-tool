@@ -18,25 +18,27 @@ def sms_signup():
         questions_json = questions.json()
         new_json_form = {
         "questions": [
-            {
-            "text": questions_json["records"][0]["fields"]["Name question"],
-            "kind": "text",
-            "airtable_id": "Name"
-            },
-            {
-            "text": questions_json["records"][0]["fields"]["Email question"],
-            "kind": "email",
-            "airtable_id": "Email"
-            }
         ],
         "title": "sign-up form"
         }
+        for (key, value) in questions_json["records"][0]["fields"].items():
+            kind = "email" if key == "Email" else "text",
+            new_question = {
+            "text": value,
+            "kind": kind,
+            "airtable_id": key
+            }
+            new_json_form["questions"].insert(0, new_question)
+        # End of question retrieval
+
+        # Encoding survey so it is JSON serializable in order to be stored in the session    
         session["signup_survey"] = jsonpickle.encode(survey_from_json(json.dumps(new_json_form)))
 
     else:
         with open('signup_form.json') as survey_file:
             session["signup_survey"] = jsonpickle.encode(survey_from_json(survey_file.read()))
 
+    # Retrieving the survey from the session requires it to be decoded
     if survey_error(jsonpickle.decode(session["signup_survey"]), response.message):
         return str(response)
     

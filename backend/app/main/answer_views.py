@@ -13,7 +13,9 @@ def answer(question_id, record_id):
 
     # Verify the response matches the expected type
     # If not, prompt user
-    if not is_allowed_answer(request.values['Body'], question.kind):
+
+    # MINOR PROBLEM: Question kind is stored in a list for some reason
+    if not is_allowed_answer(request.values['Body'], question.kind[0]):
         return redirect_invalid_twiml(question.id)
 
     # Check the record id to see if the client's information exists in the Airtable
