@@ -1,3 +1,5 @@
+from json import JSONEncoder
+
 class Question():
     TEXT = 'text'
     EMAIL = 'email'
@@ -26,3 +28,7 @@ class Survey():
     def next(self, prev_id):
     	if int(prev_id) < len(self.questions) - 1:
         	return self.questions[int(prev_id) + 1]
+
+class SurveyEncoder(JSONEncoder):
+        def default(self, o):
+            return o.__dict__

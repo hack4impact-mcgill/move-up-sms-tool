@@ -2,14 +2,42 @@ from flask import url_for, session, request
 from twilio.twiml.messaging_response import MessagingResponse
 import os
 import requests
-from . import main, signup_survey
+import json
+from .parsers import survey_from_json
+import jsonpickle
+from . import main
 
 # Main control flow: direct user to welcome message or next question
 @main.route('/message', methods=['GET'])
 def sms_signup():
     response = MessagingResponse()    
+    questions = requests.get( "https://api.airtable.com/v0/appZa3BCfY1eRJCzU/Table%201",
+            headers={"Authorization": str(os.environ.get("AIRTABLE_XIN_TEST_KEY"))})
 
-    if survey_error(signup_survey, response.message):
+    if (questions.status_code == 200): 
+        questions_json = questions.json()
+        new_json_form = {
+        "questions": [
+            {
+            "text": questions_json["records"][0]["fields"]["Name question"],
+            "kind": "text",
+            "airtable_id": "Name"
+            },
+            {
+            "text": questions_json["records"][0]["fields"]["Email question"],
+            "kind": "email",
+            "airtable_id": "Email"
+            }
+        ],
+        "title": "sign-up form"
+        }
+        session["signup_survey"] = jsonpickle.encode(survey_from_json(json.dumps(new_json_form)))
+
+    else:
+        with open('signup_form.json') as survey_file:
+            session["signup_survey"] = jsonpickle.encode(survey_from_json(survey_file.read()))
+
+    if survey_error(jsonpickle.decode(session["signup_survey"]), response.message):
         return str(response)
     
     body = request.values.get('Body', None)
@@ -25,7 +53,7 @@ def sms_signup():
         answer_url = url_for('main.answer', question_id=session['question_id'], record_id=response_id)
         response.redirect(url=answer_url)
     elif body == 'SIGNUP':
-        redirect_to_first_question(response)
+        redirect_to_first_question(response, jsonpickle.decode(session["signup_survey"]))
     elif body == 'MOVEUP':
         welcome_user(response.message, (retrieve_prev_record(phone_number)=="NONE"))
     else:
@@ -47,8 +75,8 @@ def survey_error(survey, send_function):
 
 
 # Route the user to the first question
-def redirect_to_first_question(response):
-    first_question = signup_survey.first()
+def redirect_to_first_question(response, survey):
+    first_question = survey.first()
     first_question_url = url_for('main.question', question_id=first_question.id)
     response.redirect(url=first_question_url, method='GET')
 

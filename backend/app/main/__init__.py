@@ -6,6 +6,7 @@ from .parsers import survey_from_json
 
 main = Blueprint('main', __name__) 
 
+'''
 questions = requests.get( "https://api.airtable.com/v0/appZa3BCfY1eRJCzU/Table%201",
             headers={"Authorization": str(os.environ.get("AIRTABLE_XIN_TEST_KEY"))})
 
@@ -31,7 +32,7 @@ if (questions.status_code == 200):
 else:
      with open('signup_form.json') as survey_file:
           signup_survey = survey_from_json(survey_file.read())
-
+'''
 from . import views, question_views, answer_views, survey_views
 
 

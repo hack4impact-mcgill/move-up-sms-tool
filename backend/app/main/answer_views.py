@@ -2,14 +2,14 @@ from flask import url_for, session, request, jsonify
 from twilio.twiml.messaging_response import MessagingResponse
 import os
 import requests
-from . import main, signup_survey
+import jsonpickle
+from . import main
 from .response_types import TYPE_OBJECTS
-
 
 @main.route('/answer/<question_id>/<record_id>', methods=['POST','PATCH'])
 def answer(question_id, record_id):
 
-    question = signup_survey.get(question_id)
+    question = jsonpickle.decode(session["signup_survey"]).get(question_id)
 
     # Verify the response matches the expected type
     # If not, prompt user
@@ -22,7 +22,7 @@ def answer(question_id, record_id):
     else:
         update_airtable_record(record_id, question.airtable_id, request.values['Body'])
 
-    next_question = signup_survey.next(question_id)
+    next_question = jsonpickle.decode(session["signup_survey"]).next(question_id)
     if next_question:
         return redirect_twiml(next_question.id)
     else:
