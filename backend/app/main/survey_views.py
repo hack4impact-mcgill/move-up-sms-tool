@@ -6,11 +6,7 @@ from . import main, signup_survey
 from config import config
 import app
 
-<<<<<<< HEAD
 # Main control flow: direct the user to our welcome message or onto the next question
-=======
-# Main control flow: Direct the user to our welcome message or onto the next question.
->>>>>>> Adding and improving comments. Deleting minor redundancies/irrelevant code.
 @main.route('/message', methods=['GET'])
 def sms_signup():
     response = MessagingResponse()    
@@ -31,9 +27,9 @@ def sms_signup():
         response.redirect(url=answer_url)
     elif body == 'MOVEUP':
         # First contact from user, send our welcome message
-        welcome_user(response.message)
+            elif body == 'MOVEUP':
+        welcome_user(response.message, (retrieve_prev_record(phone_number)=="NONE"))
     elif body == 'SIGNUP':
-<<<<<<< HEAD
         # User proceeds from welcome and begins signup process
         redirect_to_first_question(response)
     elif body == 'MOVEUP':
@@ -43,15 +39,6 @@ def sms_signup():
         # Otherwise, we send no message
         response.message(None)
     return str(response)
-=======
-        # Begin survey questions
-        redirect_to_first_question(response)
-    else:
-        # Otherwise, we do not send a message
-        response.message(None)
-    return str(response)
-
->>>>>>> Adding and improving comments. Deleting minor redundancies/irrelevant code.
 
 # Catch survey errors
 def survey_error(survey, send_function):
@@ -70,21 +57,12 @@ def redirect_to_first_question(response):
     response.redirect(url=first_question_url, method='GET')
 
 # Send a welcome message to the user
-<<<<<<< HEAD
 def welcome_user(send_function, is_prev_response=False):
     if not is_prev_response:
         # First contact (we have no record from them), send welcome message
         welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
     else:
         # We already have a file for this user, ask if they want to update their info
-=======
-def welcome_user(survey, send_function, response_id):
-    if response_id=="NONE":
-        # First contact, send the welcome message
-        welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
-    else:
-        # We already have a file for this user, ask if they want to update their information or not
->>>>>>> Adding and improving comments. Deleting minor redundancies/irrelevant code.
         welcome_text = 'It appears as though we already have a response from you. If you would like to update your information, please respond SIGNUP. Otherwise, we will keep your current information as is.'
     send_function(welcome_text)
 

@@ -19,8 +19,13 @@ class Question():
 # A class for our survey
 >>>>>>> Adding and improving comments. Deleting minor redundancies/irrelevant code.
 class Survey():
-    def __init__(self):
-        self.questions = []
+    def __init__(self, content, questions=[], session_id):
+        self.questions = questions
+        if content:
+            self.content = content
+        if session_id:
+            self.session_id = session_id
+
     # Adding questions to our survey
     def add_question(self, airtable_id, text, kind=Question.TEXT):
         question = Question(len(self.questions), airtable_id, text, kind)
@@ -34,6 +39,7 @@ class Survey():
 
     def next(self, prev_id):
     	if int(prev_id) < len(self.questions) - 1:
+<<<<<<< HEAD
         	return self.questions[int(prev_id) + 1]
 <<<<<<< HEAD
 =======
@@ -43,3 +49,6 @@ class Survey():
         self.question = question
         self.session_id = session_id
 >>>>>>> Adding and improving comments. Deleting minor redundancies/irrelevant code.
+=======
+        	return self.questions[int(prev_id) + 1]
+>>>>>>> Update to pull request
