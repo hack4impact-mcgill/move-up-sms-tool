@@ -35,6 +35,7 @@ def sms_signup():
         session["signup_survey"] = jsonpickle.encode(survey_from_json(json.dumps(new_json_form)))
 
     else:
+        # If the request fails, get the default name and email questions.
         with open('signup_form.json') as survey_file:
             session["signup_survey"] = jsonpickle.encode(survey_from_json(survey_file.read()))
 
