@@ -11,8 +11,8 @@ from . import main
 @main.route('/message', methods=['GET'])
 def sms_signup():
     response = MessagingResponse()    
-    questions = requests.get( "https://api.airtable.com/v0/appZa3BCfY1eRJCzU/Table%201",
-            headers={"Authorization": str(os.environ.get("AIRTABLE_XIN_TEST_KEY"))})
+    questions = requests.get( "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Questions/recRT4MAzeLUnLB7l",
+            headers={"Authorization": str(os.environ.get("API_KEY"))})
 
     if (questions.status_code == 200): 
         questions_json = questions.json()
@@ -21,14 +21,14 @@ def sms_signup():
         ],
         "title": "sign-up form"
         }
-        for (key, value) in questions_json["records"][0]["fields"].items():
+        for (key, value) in questions_json["fields"].items():
             kind = "email" if key == "Email" else "text",
             new_question = {
             "text": value,
             "kind": kind,
             "airtable_id": key
             }
-            new_json_form["questions"].insert(0, new_question)
+            new_json_form["questions"].append(new_question)
         # End of question retrieval
 
         # Encoding survey so it is JSON serializable in order to be stored in the session    
