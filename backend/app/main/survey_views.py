@@ -25,7 +25,8 @@ def sms_signup():
         response.redirect(url=answer_url)
     elif body == 'MOVEUP':
         # First contact from user, send our welcome message
-        welcome_user(response.message)
+            elif body == 'MOVEUP':
+        welcome_user(response.message, (retrieve_prev_record(phone_number)=="NONE"))
     elif body == 'SIGNUP':
         # Begin survey questions
         redirect_to_first_question(response)

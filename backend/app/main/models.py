@@ -11,8 +11,13 @@ class Question():
 
 # A class for our survey
 class Survey():
-    def __init__(self):
-        self.questions = []
+    def __init__(self, content, questions=[], session_id):
+        self.questions = questions
+        if content:
+            self.content = content
+        if session_id:
+            self.session_id = session_id
+
     # Adding questions to our survey
     def add_question(self, airtable_id, text, kind=Question.TEXT):
         question = Question(len(self.questions), airtable_id, text, kind)
@@ -27,8 +32,3 @@ class Survey():
     def next(self, prev_id):
     	if int(prev_id) < len(self.questions) - 1:
         	return self.questions[int(prev_id) + 1]
-
-    def __init__(self, content, question, session_id):
-        self.content = content
-        self.question = question
-        self.session_id = session_id
