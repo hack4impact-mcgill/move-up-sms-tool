@@ -3,7 +3,12 @@ import os
 class Config:
     APP_NAME = "Move Up Sign-Up Tool"
     SECRET_KEY = os.environ.get("SECRET_KEY") or "hard to guess string"
-    DATABASE_URL = str(os.environ.get("DEV_URL"))
+
+    @property
+    def DATABASE_URL(self):
+        if os.getenv("FLASK_CONFIG")=='production':
+            return str(os.environ.get("PROD_URL"))
+        else: return str(os.environ.get("DEV_URL"))
 
     @staticmethod
     def init_app(app):
@@ -17,11 +22,10 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     PRODUCTION = True
-    DATABASE_URL = str(os.environ.get("PROD_URL"))
 
 config = {
-    "development": DevelopmentConfig,
-    "testing": TestingConfig,
-    "production": ProductionConfig,
-    "default": DevelopmentConfig,
+    "development": DevelopmentConfig(),
+    "testing": TestingConfig(),
+    "production": ProductionConfig(),
+    "default": DevelopmentConfig(),
 }
