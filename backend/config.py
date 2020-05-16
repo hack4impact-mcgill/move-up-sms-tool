@@ -1,7 +1,7 @@
 import os
 
 class Config:
-    APP_NAME = "Move Up Sign-Up Tool"
+    APP_NAME = "Move Up SMS Sign-Up Tool"
     SECRET_KEY = os.environ.get("SECRET_KEY") or "hard to guess string"
 
     @property

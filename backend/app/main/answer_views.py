@@ -8,20 +8,16 @@ from config import config
 
 @main.route('/answer/<question_id>/<record_id>', methods=['POST','PATCH'])
 def answer(question_id, record_id):
-
     question = signup_survey.get(question_id)
-
     # Verify the response matches the expected type
     # If not, prompt user
     if not is_allowed_answer(request.values['Body'], question.kind):
         return redirect_invalid_twiml(question.id)
-
     # Check the record id to see if the client's information exists in the Airtable
     if record_id == "NONE":
         create_airtable_record(request.values['From'], question.airtable_id, request.values['Body'])
     else:
         update_airtable_record(record_id, question.airtable_id, request.values['Body'])
-
     next_question = signup_survey.next(question_id)
     if next_question:
         return redirect_twiml(next_question.id)
@@ -36,15 +32,13 @@ def is_allowed_answer(body, question_kind):
 def redirect_invalid_twiml(question_id):
     response = MessagingResponse()
     response.message("Invalid response. Please try again!")
-    response.redirect(url=url_for('main.question', question_id=question_id),
-                      method='GET')
+    response.redirect(url=url_for('main.question', question_id=question_id), method='GET')
     return str(response)
 
 # Redirect to the question route
 def redirect_twiml(question_id):
     response = MessagingResponse()
-    response.redirect(url=url_for('main.question', question_id=question_id),
-                      method='GET')
+    response.redirect(url=url_for('main.question', question_id=question_id), method='GET')
     return str(response)
 
 # Compose end of survey text
@@ -63,7 +57,7 @@ def update_airtable_record(record_id, field_name, field_value):
         field_name: field_value
     }}
     requests.patch( 
-            config[os.getenv("FLASK_CONFIG")].DATABASE_URL + "/{}".format(record_id),json=temp_field,
+            "{}/{}".format(config[os.getenv("FLASK_CONFIG")].DATABASE_URL, record_id),json=temp_field,
             headers={"Authorization": str(os.environ.get("API_KEY"))})
 
 # Create a new record in the Airtable for the client and store their phone numbers
