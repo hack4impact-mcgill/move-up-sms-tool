@@ -32,7 +32,6 @@ def answer(question_id, record_id):
 def is_allowed_answer(body, question_kind):
     return TYPE_OBJECTS[question_kind].is_valid(body)
 
-
 # Redirect invalid answer
 def redirect_invalid_twiml(question_id):
     response = MessagingResponse()
@@ -41,14 +40,12 @@ def redirect_invalid_twiml(question_id):
                       method='GET')
     return str(response)
 
-
 # Redirect to the question route
 def redirect_twiml(question_id):
     response = MessagingResponse()
     response.redirect(url=url_for('main.question', question_id=question_id),
                       method='GET')
     return str(response)
-
 
 # Compose end of survey text
 # TODO change message as per conversation with MoveUp
@@ -66,7 +63,7 @@ def update_airtable_record(record_id, field_name, field_value):
         field_name: field_value
     }}
     requests.patch( 
-            config["development"].DATABASE_URL + "/{}".format(record_id),json=temp_field,
+            config[os.getenv("FLASK_CONFIG")].DATABASE_URL + "/{}".format(record_id),json=temp_field,
             headers={"Authorization": str(os.environ.get("API_KEY"))})
 
 # Create a new record in the Airtable for the client and store their phone numbers
@@ -78,5 +75,5 @@ def create_airtable_record(phone_num, field_name, field_value):
     }}
     temp_record = {"records": [temp_field]}
     requests.post(
-        config["development"].DATABASE_URL, json=temp_record,
+        config[os.getenv("FLASK_CONFIG")].DATABASE_URL, json=temp_record,
         headers={"Authorization": str(os.environ.get("API_KEY"))})
