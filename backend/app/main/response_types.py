@@ -11,11 +11,7 @@ class TextResponse(ResponseType):
     def is_valid(self, arg):
         return True
 
-<<<<<<< HEAD
 # Regex matching to validate email address inputs
-=======
-# Regex matching to validate email addresses
->>>>>>> Adding and improving comments. Deleting minor redundancies/irrelevant code.
 class EmailResponse(ResponseType):
     def is_valid(self, arg):
         return re.match(r'[^@]+@[^@]+\.[^@]+', arg)
