@@ -16,10 +16,11 @@ def sms_signup():
 
     body = request.values.get('Body', None)
     if body: body = body.strip()
+        
+    # Retrieve the client's phone number and format it
+    phone_number = "%2B" + request.values.get('From', " ")[1: ] 
 
     if 'question_id' in session:
-        # Retrieve the client's phone number and format it
-        phone_number = "%2B" + request.values.get('From', " ")[1: ]
         # Retrieve the record id to check if the client registered before
         response_id = retrieve_prev_record(phone_number)
         # Redirect the response to the answer-saving url
