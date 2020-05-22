@@ -29,6 +29,7 @@ class Survey():
     	if int(prev_id) < len(self.questions) - 1:
         	return self.questions[int(prev_id) + 1]
 
+# Encode Survey class to be JSON serializable
 class SurveyEncoder(JSONEncoder):
         def default(self, o):
             return o.__dict__
