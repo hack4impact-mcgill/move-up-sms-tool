@@ -32,9 +32,6 @@ def sms_signup():
     elif body == 'SIGNUP':
         # User proceeds from welcome and begins signup process
         redirect_to_first_question(response)
-    elif body == 'MOVEUP':
-        # Initial contact, send welcome message
-        welcome_user(response.message, (retrieve_prev_record(phone_number)=="NONE"))
     else:
         # Otherwise, we send no message
         response.message(None)
