@@ -94,7 +94,7 @@ def welcome_user(send_function, is_prev_response=False):
 # Check if record already exists
 def retrieve_prev_record(phone_number):
     prev_response = requests.get( 
-            config[os.getenv("FLASK_CONFIG")].DATABASE_URL + "?filterByFormula={Phone_Number}='" + phone_number + "'",
+            config[os.getenv("FLASK_CONFIG")].DATABASE_URL + "?filterByFormula={Phone_Number}='" + "+" + phone_number + "'",
             headers={"Authorization": str(os.environ.get("API_KEY"))})
     # Default value for response id 
     response_id = "NONE"
