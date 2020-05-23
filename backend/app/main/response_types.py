@@ -7,16 +7,13 @@ class ResponseType(ABC):
     def is_valid(self, arg):
         pass
     
-
 class TextResponse(ResponseType):
     def is_valid(self, arg):
         return True
 
-
 class EmailResponse(ResponseType):
     def is_valid(self, arg):
         return re.match(r'[^@]+@[^@]+\.[^@]+', arg)
-
 
 # Connect db types with their corresponding objects
 # for SMS instructions and validating responses

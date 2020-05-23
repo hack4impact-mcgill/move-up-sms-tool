@@ -6,6 +6,8 @@ import json
 from .parsers import survey_from_json
 import jsonpickle
 from . import main
+from config import config
+import app
 
 # Main control flow: direct user to welcome message or next question
 @main.route('/message', methods=['GET'])
@@ -65,7 +67,6 @@ def sms_signup():
     response.message(None)
     return str(response)
 
-
 # Catch survey errors
 def survey_error(survey, send_function):
     if not survey:
@@ -76,13 +77,11 @@ def survey_error(survey, send_function):
         return True
     return False
 
-
 # Route the user to the first question
 def redirect_to_first_question(response, survey):
     first_question = survey.first()
     first_question_url = url_for('main.question', question_id=first_question.id)
     response.redirect(url=first_question_url, method='GET')
-
 
 # Send a welcome message to the user
 def welcome_user(send_function, is_prev_response=False):
@@ -92,11 +91,10 @@ def welcome_user(send_function, is_prev_response=False):
         welcome_text = 'It appears as though we already have a response from you. If you would like to update your information, please respond SIGNUP. Otherwise, we will keep your current information as is.'
     send_function(welcome_text)
 
-
 # Check if record already exists
 def retrieve_prev_record(phone_number):
     prev_response = requests.get( 
-            "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Responses?filterByFormula={Phone_Number}='"+phone_number+"'",
+            config[os.getenv("FLASK_CONFIG")].DATABASE_URL + "?filterByFormula={Phone_Number}='" + phone_number + "'",
             headers={"Authorization": str(os.environ.get("API_KEY"))})
     # Default value for response id 
     response_id = "NONE"
