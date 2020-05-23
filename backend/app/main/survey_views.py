@@ -13,9 +13,9 @@ import app
 @main.route('/message', methods=['GET'])
 def sms_signup():
     response = MessagingResponse()    
-    questions = requests.get( "https://api.airtable.com/v0/appw4RRMDig1g2PFI/SMS%20Questions/recRT4MAzeLUnLB7l",
+    questions = requests.get(
+            config[os.getenv("FLASK_CONFIG")].QUESTIONS_URL,
             headers={"Authorization": str(os.environ.get("API_KEY"))})
-
     if (questions.status_code == 200): 
         questions_json = questions.json()
         new_json_form = {

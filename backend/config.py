@@ -10,6 +10,11 @@ class Config:
             return str(os.environ.get("PROD_URL"))
         else: return str(os.environ.get("DEV_URL"))
 
+    @property
+    def QUESTIONS_URL(self):
+        if os.getenv("FLASK_CONFIG")=='production':
+            return str(os.environ.get("PROD_QUESTIONS_URL"))
+        else: return str(os.environ.get("DEV_QUESTIONS_URL"))
     @staticmethod
     def init_app(app):
         pass
