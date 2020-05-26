@@ -19,13 +19,17 @@ def answer(question_id, record_id):
         return redirect_invalid_twiml(question.id)
     # Check the record id to see if the client's information exists in the Airtable
     if record_id == "NONE":
+        # If not, create a record for them
         create_airtable_record(request.values['From'], question.airtable_id, request.values['Body'])
     else:
+        # If so, we update their record
         update_airtable_record(record_id, question.airtable_id, request.values['Body'])
     next_question = jsonpickle.decode(session["signup_survey"]).next(question_id)
     if next_question:
+        # If survey is not completed, ask the next question
         return redirect_twiml(next_question.id)
     else:
+        # Otherwise, send goodbye / thank you message
         return goodbye_twiml()
 
 # Verify that the answer matches the expected type
