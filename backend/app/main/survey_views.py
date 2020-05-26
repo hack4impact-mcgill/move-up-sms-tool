@@ -24,7 +24,7 @@ def sms_signup():
         "title": "sign-up form"
         }
         for (key, value) in questions_json["fields"].items():
-            kind = "email" if key == "Email" else "text",
+            kind = "email" if key == "Email" else "text"
             new_question = {
             "text": value,
             "kind": kind,
