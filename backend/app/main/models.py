@@ -1,3 +1,4 @@
+# Class to define survey questions
 class Question():
     TEXT = 'text'
     EMAIL = 'email'
@@ -8,11 +9,12 @@ class Question():
         self.text = text
         self.kind = kind
 
-
+# Class to define the survey
 class Survey():
     def __init__(self):
         self.questions = []
 
+    # Adding questions to our survey
     def add_question(self, airtable_id, text, kind=Question.TEXT):
         question = Question(len(self.questions), airtable_id, text, kind)
         self.questions.append(question)
