@@ -2,7 +2,10 @@ from flask import url_for, session, request
 from twilio.twiml.messaging_response import MessagingResponse
 import os
 import requests
-from . import main, signup_survey
+import json
+from .parsers import survey_from_json
+import jsonpickle
+from . import main
 from config import config
 import app
 
@@ -10,8 +13,36 @@ import app
 @main.route('/message', methods=['GET'])
 def sms_signup():
     response = MessagingResponse()    
-    
-    if survey_error(signup_survey, response.message):
+    questions = requests.get(
+            config[os.getenv("FLASK_CONFIG")].QUESTIONS_URL,
+            headers={"Authorization": str(os.environ.get("API_KEY"))})
+    if (questions.status_code == 200): 
+        questions_json = questions.json()
+        new_json_form = {
+        "questions": [
+        ],
+        "title": "sign-up form"
+        }
+        for (key, value) in questions_json["fields"].items():
+            kind = "email" if key == "Email" else "text"
+            new_question = {
+            "text": value,
+            "kind": kind,
+            "airtable_id": key
+            }
+            new_json_form["questions"].append(new_question)
+        # End of question retrieval
+
+        # Encoding survey so it is JSON serializable in order to be stored in the session    
+        session["signup_survey"] = jsonpickle.encode(survey_from_json(json.dumps(new_json_form)))
+
+    else:
+        # If the request fails, get the default name and email questions.
+        with open('signup_form.json') as survey_file:
+            session["signup_survey"] = jsonpickle.encode(survey_from_json(survey_file.read()))
+
+    # Retrieving the survey from the session requires it to be decoded
+    if survey_error(jsonpickle.decode(session["signup_survey"]), response.message):
         return str(response)
 
     body = request.values.get('Body', None)
@@ -31,7 +62,7 @@ def sms_signup():
         welcome_user(response.message, (retrieve_prev_record(phone_number)=="NONE"))
     elif body == 'SIGNUP':
         # User proceeds from welcome and begins signup process
-        redirect_to_first_question(response)
+        redirect_to_first_question(response, jsonpickle.decode(session["signup_survey"]))
     else:
         # Otherwise, we send no message
         response.message(None)
@@ -48,8 +79,8 @@ def survey_error(survey, send_function):
     return False
 
 # Route the user to the first question
-def redirect_to_first_question(response):
-    first_question = signup_survey.first()
+def redirect_to_first_question(response, survey):
+    first_question = survey.first()
     first_question_url = url_for('main.question', question_id=first_question.id)
     response.redirect(url=first_question_url, method='GET')
 
@@ -66,7 +97,7 @@ def welcome_user(send_function, is_prev_response=False):
 # Check if record already exists
 def retrieve_prev_record(phone_number):
     prev_response = requests.get( 
-            config[os.getenv("FLASK_CONFIG")].DATABASE_URL + "?filterByFormula={Phone_Number}='" + phone_number + "'",
+            config[os.getenv("FLASK_CONFIG")].DATABASE_URL + "?filterByFormula={Phone_Number}='" + "+" + phone_number + "'",
             headers={"Authorization": str(os.environ.get("API_KEY"))})
     # Default value for response id is NONE
     response_id = "NONE"
