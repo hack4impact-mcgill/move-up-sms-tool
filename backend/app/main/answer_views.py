@@ -24,7 +24,6 @@ def answer(question_id, record_id):
     else:
         # If so, we update their record
         update_airtable_record(record_id, question.airtable_id, request.values['Body'])
-    next_question = signup_survey.next(question_id)
     next_question = jsonpickle.decode(session["signup_survey"]).next(question_id)
     if next_question:
         # If survey is not completed, ask the next question
