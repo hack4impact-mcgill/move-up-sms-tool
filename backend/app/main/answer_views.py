@@ -2,26 +2,35 @@ from flask import url_for, session, request, jsonify
 from twilio.twiml.messaging_response import MessagingResponse
 import os
 import requests
-from . import main, signup_survey
+import jsonpickle
+from . import main
 from .response_types import TYPE_OBJECTS
 from config import config
 
 @main.route('/answer/<question_id>/<record_id>', methods=['POST','PATCH'])
 def answer(question_id, record_id):
-    question = signup_survey.get(question_id)
+
+    question = jsonpickle.decode(session["signup_survey"]).get(question_id)
+
     # Verify the response matches the expected type
     # If not, prompt user
+
     if not is_allowed_answer(request.values['Body'], question.kind):
         return redirect_invalid_twiml(question.id)
     # Check the record id to see if the client's information exists in the Airtable
     if record_id == "NONE":
+        # If not, create a record for them
         create_airtable_record(request.values['From'], question.airtable_id, request.values['Body'])
     else:
+        # If so, we update their record
         update_airtable_record(record_id, question.airtable_id, request.values['Body'])
     next_question = signup_survey.next(question_id)
+    next_question = jsonpickle.decode(session["signup_survey"]).next(question_id)
     if next_question:
+        # If survey is not completed, ask the next question
         return redirect_twiml(next_question.id)
     else:
+        # Otherwise, send goodbye / thank you message
         return goodbye_twiml()
 
 # Verify that the answer matches the expected type

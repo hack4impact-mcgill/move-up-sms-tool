@@ -1,3 +1,6 @@
+from json import JSONEncoder
+
+# Class to define survey questions
 class Question():
     TEXT = 'text'
     EMAIL = 'email'
@@ -8,11 +11,12 @@ class Question():
         self.text = text
         self.kind = kind
 
-
+# Class to define the survey
 class Survey():
     def __init__(self):
         self.questions = []
 
+    # Adding questions to our survey
     def add_question(self, airtable_id, text, kind=Question.TEXT):
         question = Question(len(self.questions), airtable_id, text, kind)
         self.questions.append(question)
@@ -26,3 +30,8 @@ class Survey():
     def next(self, prev_id):
     	if int(prev_id) < len(self.questions) - 1:
         	return self.questions[int(prev_id) + 1]
+
+# Encode Survey class to be JSON serializable
+class SurveyEncoder(JSONEncoder):
+        def default(self, o):
+            return o.__dict__
