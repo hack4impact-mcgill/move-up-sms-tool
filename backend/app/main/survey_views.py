@@ -86,7 +86,7 @@ def redirect_to_first_question(response, survey):
 
 # Send a welcome message to the user
 def welcome_user(send_function, is_prev_response=False):
-    if not is_prev_response:
+    if is_prev_response:
         # First contact (we have no record from them), send welcome message
         welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
     else:
@@ -97,7 +97,7 @@ def welcome_user(send_function, is_prev_response=False):
 # Check if record already exists
 def retrieve_prev_record(phone_number):
     prev_response = requests.get( 
-            config[os.getenv("FLASK_CONFIG")].DATABASE_URL + "?filterByFormula={Phone_Number}='" + "+" + phone_number + "'",
+            config[os.getenv("FLASK_CONFIG")].DATABASE_URL + "?filterByFormula={Phone_Number}='" + phone_number + "'",
             headers={"Authorization": str(os.environ.get("API_KEY"))})
     # Default value for response id is NONE
     response_id = "NONE"
