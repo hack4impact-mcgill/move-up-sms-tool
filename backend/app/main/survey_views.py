@@ -85,8 +85,8 @@ def redirect_to_first_question(response, survey):
     response.redirect(url=first_question_url, method='GET')
 
 # Send a welcome message to the user
-def welcome_user(send_function, is_prev_response=False):
-    if is_prev_response:
+def welcome_user(send_function, no_prev_response=False):
+    if no_prev_response:
         # First contact (we have no record from them), send welcome message
         welcome_text = 'Welcome to Move Up! To sign up and get paired with a mentor, you can either continue here or head to our online form (https://bit.ly/moveup-signup). To continue here, please respond SIGNUP.'
     else:
