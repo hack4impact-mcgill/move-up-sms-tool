@@ -23,6 +23,8 @@ def sms_signup():
         ],
         "title": "sign-up form"
         }
+
+        name_inserted = False
         for (key, value) in questions_json["fields"].items():
             kind = "email" if key == "Email" else "text"
             new_question = {
@@ -30,7 +32,17 @@ def sms_signup():
             "kind": kind,
             "airtable_id": key
             }
-            new_json_form["questions"].append(new_question)
+
+            if key == "Name":
+                new_json_form["questions"].insert(0, new_question)
+                name_inserted = True
+            elif key == "Email":
+                if name_inserted:
+                    new_json_form["questions"].insert(1, new_question)
+                else:
+                    new_json_form["questions"].insert(0, new_question)
+            else:
+                new_json_form["questions"].append(new_question)
         # End of question retrieval
 
         # Encoding survey so it is JSON serializable in order to be stored in the session    
